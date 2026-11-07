@@ -1,5 +1,5 @@
 // Offline support: pages are network-first (so updates arrive), everything else cache-first.
-const CACHE = 'mental-math-v1';
+const CACHE = 'mental-math-v3';
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./', './index.html', './manifest.webmanifest'])).then(() => self.skipWaiting()));
 });
