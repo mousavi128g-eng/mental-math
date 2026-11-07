@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { generate, twoStep } from './generate';
-import { mark, plan, stepUpCandidate, updateReviews, mastery } from './logic';
+import { mark, plan, stepUpCandidate, updateReviews, mastery, streak, addDays, day, checkAwards } from './logic';
+import { estimateQuestion } from './generate';
 import { SKILLS } from './skills';
 import { freshState } from '../store';
 
 const st = freshState();
-const o = { rates: st.rates, friendly: true, tomanUnit: 'thousand' as const, roundRates: true };
+const o = { rates: st.rates, friendly: true, tomanUnit: 'million' as const, roundRates: true };
 
 describe('generator', () => {
   for (const s of SKILLS) s.levels.forEach((name, i) => {
@@ -27,13 +28,16 @@ describe('generator', () => {
 });
 
 describe('marking', () => {
-  const q = { skill: 'mul' as const, level: 4, kind: 'mul-2x2', prompt: '34 × 23', answer: 782, hint: '' };
+  const q = { skill: 'mul' as const, level: 4, kind: 'mul-2x2', title: 'Multiply', prompt: '34 × 23', answer: 782, hint: '' };
   it('exact, close and wrong', () => {
     expect(mark(q, 782, 2)).toBe('exact');
     expect(mark(q, 790, 2)).toBe('close');
     expect(mark(q, 7820, 2)).toBe('wrong'); // a stray zero is always wrong
     expect(mark(q, 790, 0)).toBe('wrong');
     expect(mark(q, null, 2)).toBe('wrong');
+    expect(mark(q, 830, 2, true, 10)).toBe('estimate');   // ~6% off, answered as an estimate
+    expect(mark(q, 830, 2, false, 10)).toBe('wrong');     // same answer, not flagged as an estimate
+    expect(mark({ ...q, estimateOk: true }, 830, 2, false, 10)).toBe('estimate');
   });
 });
 
@@ -62,5 +66,41 @@ describe('planner and adaptivity', () => {
     expect(stepUpCandidate(s)).toBe('pct');
     s.settings.offerStepUps = false; expect(stepUpCandidate(s)).toBe(null);
     expect(mastery(s.attempts, 'pct', 4)).toBe(100);
+  });
+});
+
+describe('questions are clear', () => {
+  it('every question has an instruction, and every conversion shows its rate', () => {
+    for (const s of SKILLS) s.levels.forEach((_, i) => {
+      for (let k = 0; k < 100; k++) {
+        const q = generate(s.id, i + 1, o);
+        expect(q.title.length).toBeGreaterThan(3);
+        expect(q.hint.length).toBeGreaterThan(5);
+        if (s.id === 'fx' || s.id === 'toman') expect(q.context ?? '').toMatch(/=/);
+      }
+    });
+    for (let k = 0; k < 100; k++) { const q = estimateQuestion(o); expect(q.estimateOk).toBe(true); expect(q.answer).toBeGreaterThan(0); }
+  });
+});
+
+describe('session modes', () => {
+  it('builds each mode', () => {
+    const s = freshState();
+    expect(plan(s, { mode: 'quick' })).toHaveLength(5);
+    expect(plan(s, { mode: 'skill', skill: 'toman' }).every(q => q.skill === 'toman')).toBe(true);
+    expect(plan(s, { mode: 'estimate' }).every(q => q.estimateOk)).toBe(true);
+    expect(plan(s, { mode: 'review' })).toHaveLength(0);
+    updateReviews(s, generate('fx', 2, o), 'wrong', 1);
+    expect(plan(s, { mode: 'review' }).every(q => q.kind === 'fx-usd-gbp' && q.review)).toBe(true);
+  });
+});
+
+describe('streak freezes', () => {
+  it('covers one missed day per week', () => {
+    const s = freshState(); const t = day();
+    const mk = (d: string) => s.sessions.push({ id: d, mode: 'daily', label: '', startedAt: d + 'T12:00:00', endedAt: d + 'T12:05:00', total: 10, correct: 10, firstTry: 10, ms: 1 });
+    mk(t); mk(addDays(t, -1)); mk(addDays(t, -3)); mk(addDays(t, -4));
+    expect(streak(s).count).toBe(4);
+    checkAwards(s); expect(s.awards.first).toBeTruthy();
   });
 });
