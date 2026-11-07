@@ -7,14 +7,16 @@ A calm, ten-minute daily drill for the maths that comes up at work and at home: 
 2. Tap **Share → Add to Home Screen**.
 3. Open it from the home screen. It runs full screen and works offline.
 
-## What's in this version (blueprint phases 1 + 2)
-- One question at a time, custom keypad, and "Correct." / "Not quite. Try again." feedback only. **Explain** shows the method only when you tap it.
-- Close answers count (±2% by default, set per skill). A stray zero is always wrong.
-- Friendly, round numbers, generated fresh each time across 5 skills and 24 levels.
-- Mastery score for each skill, a review queue that brings misses back after 1, 3 and 7 days, and a weak-spot-focused daily mix.
-- Step-up offers only when you've earned them, and the level only goes up if you tap **Step up**.
-- Progress: streak, a 5-week calendar, a first-try accuracy trend with level and rate changes marked, skill bars, error patterns (like multiplying instead of dividing on $ → £) and a change log.
-- Settings: difficulty per skill (level, practise / review only / pause, step-up rule, auto step-down), exchange rates with history, sessions, marking, display, and data export (CSV).
+## What's in this version (v0.3: blueprint phases 1 to 3)
+- **Clear questions:** every question has a one-line instruction, shows the rate it uses (e.g. £1 = $1.27) and puts the unit next to the answer.
+- **Wrong answers:** you see the correct answer and a short explanation, then tap Next. Retries are optional in Settings.
+- **Estimates:** tap **≈ Estimate** on any question. Within ±10% counts as a good estimate. Questions marked "Estimate welcome" accept estimates automatically, and there's an Estimation round too.
+- **In-session menu (⋯):** skip, hint, answer as an estimate, restart with new questions, show a timer, end the session.
+- **Practice tab and menu:** today's session, quick 5, weak spot, estimation round, review misses, or drill any one skill.
+- **Progress:** Overview (stats, calendar, trend with level and rate changes marked, error patterns), Skills (mastery, speed, sparklines, a detail page for each skill), History (tap a session to see every answer) and Awards (personal bests and milestones).
+- **Habit:** streak with one freeze per week, a weekly review, a daily reminder added to your calendar, and a quiet mode.
+- **Rates:** set your own, or switch to live daily £/$/€ rates (ECB data). Toman is always set by you, with a reminder to update it. There's a full rate history.
+- **Adaptive:** a mastery score for each skill, misses that come back after 1, 3 and 7 days, and step-up offers that only change your level if you accept.
 
 ## Develop
 ```bash
