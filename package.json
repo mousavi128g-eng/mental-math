@@ -1,0 +1,18 @@
+{
+  "name": "mental-math",
+  "version": "0.2.0",
+  "description": "A calm daily mental maths drill for iPhone (installable web app).",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4"
+  },
+  "private": true,
+  "type": "module"
+}
